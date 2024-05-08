@@ -1,9 +1,11 @@
-struct Token {
-    kind: TokenKind,
-    literal: String,
+#[derive(Debug, Clone)]
+pub struct Token {
+    pub kind: TokenKind,
+    pub literal: String,
 }
 
-enum TokenKind {
+#[derive(Debug, Clone, Copy)]
+pub enum TokenKind {
     Illegal,
     Eof,
     Ident,

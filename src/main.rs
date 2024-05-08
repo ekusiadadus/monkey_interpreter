@@ -1,4 +1,8 @@
 pub mod token;
 fn main() {
-    println!("Hello, world!");
+    let token = token::Token {
+        kind: token::TokenKind::Ident,
+        literal: "foobar".to_string(),
+    };
+    println!("{:?}", token)
 }
