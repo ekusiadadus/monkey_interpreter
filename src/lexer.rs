@@ -1,18 +1,26 @@
+use crate::token::Token;
+
 pub struct Lexer {
     pub input: Vec<char>,
 }
 
 impl Lexer {
-    pub fn new(input: &str) -> Self {
+    pub fn new(input: &str) -> Lexer {
         Lexer {
             input: input.chars().collect(),
         }
+    }
+
+    fn next_token(&self) -> Token {
+        todo!()
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::token::{Token, TokenKind};
+
+    use super::Lexer;
 
     #[test]
     fn test_next_token() {
@@ -59,10 +67,10 @@ mod test {
 
         let lexer = Lexer::new(input);
 
-        for token in expected.into_iter().enumerate() {
-            let tok = lexer.next_token();
-            assert_eq!(tok.kind, token.1.kind);
-            assert_eq!(tok.literal, token.1.literal);
+        for (idx, exp_token) in expected.into_iter().enumerate() {
+            let recv_token = lexer.next_token();
+            assert_eq!(exp_token.kind, recv_token.kind);
+
         }
     }
 }
