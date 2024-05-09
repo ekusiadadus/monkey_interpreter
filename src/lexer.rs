@@ -69,8 +69,16 @@ mod test {
 
         for (idx, exp_token) in expected.into_iter().enumerate() {
             let recv_token = lexer.next_token();
-            assert_eq!(exp_token.kind, recv_token.kind);
-
+            assert_eq!(
+                exp_token.kind, recv_token.kind,
+                "tests[{idx}] - token type wrong. expected={:?}, got={:?}",
+                exp_token.kind, recv_token.kind
+            );
+            assert_eq!(
+                exp_token.literal, recv_token.literal,
+                "tests[{idx}] - token literal wrong. expected={}, got={}",
+                exp_token.literal, recv_token.literal
+            );
         }
     }
 }
