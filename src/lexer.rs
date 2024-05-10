@@ -431,4 +431,106 @@ mod test {
             );
         }
     }
+
+    #[test]
+    fn test_next_token_3() {
+        let input = r#"
+        if(5<10){
+            return true;
+        }else{
+            return false;
+        }
+        "#;
+
+        let expected: Vec<Token> = vec![
+            Token {
+                kind: TokenKind::If,
+                literal: "if".to_string(),
+            },
+            Token {
+                kind: TokenKind::LParen,
+                literal: "(".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "5".to_string(),
+            },
+            Token {
+                kind: TokenKind::Lt,
+                literal: "<".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "10".to_string(),
+            },
+            Token {
+                kind: TokenKind::RParen,
+                literal: ")".to_string(),
+            },
+            Token {
+                kind: TokenKind::LBrace,
+                literal: "{".to_string(),
+            },
+            Token {
+                kind: TokenKind::Return,
+                literal: "return".to_string(),
+            },
+            Token {
+                kind: TokenKind::True,
+                literal: "true".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
+            },
+            Token {
+                kind: TokenKind::RBrace,
+                literal: "}".to_string(),
+            },
+            Token {
+                kind: TokenKind::Else,
+                literal: "else".to_string(),
+            },
+            Token {
+                kind: TokenKind::LBrace,
+                literal: "{".to_string(),
+            },
+            Token {
+                kind: TokenKind::Return,
+                literal: "return".to_string(),
+            },
+            Token {
+                kind: TokenKind::False,
+                literal: "false".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
+            },
+            Token {
+                kind: TokenKind::RBrace,
+                literal: "}".to_string(),
+            },
+            Token {
+                kind: TokenKind::Eof,
+                literal: "".to_string(),
+            },
+        ];
+
+        let mut lexer = Lexer::new(input);
+
+        for (idx, exp_token) in expected.into_iter().enumerate() {
+            let recv_token = &lexer.next_token();
+            assert_eq!(
+                exp_token.kind, recv_token.kind,
+                "tests[{idx}] - token type wrong. expected={:?}, got={:?}",
+                exp_token.kind, recv_token.kind
+            );
+            assert_eq!(
+                exp_token.literal, recv_token.literal,
+                "tests[{idx}] - token literal wrong. expected={}, got={}",
+                exp_token.literal, recv_token.literal
+            );
+        }
+    }
 }

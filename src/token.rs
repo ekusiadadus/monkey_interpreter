@@ -34,6 +34,12 @@ pub enum TokenKind {
 
     Function,
     Let,
+    If,
+    Else,
+    Return,
+
+    True,
+    False,
 }
 
 impl Display for TokenKind {
@@ -59,6 +65,11 @@ impl Display for TokenKind {
             TokenKind::RBrace => write!(f, "{}", std::char::from_u32(125).unwrap()),
             TokenKind::Function => write!(f, "fn"),
             TokenKind::Let => write!(f, "let"),
+            TokenKind::If => write!(f, "if"),
+            TokenKind::Else => write!(f, "else"),
+            TokenKind::True => write!(f, "true"),
+            TokenKind::False => write!(f, "false"),
+            TokenKind::Return => write!(f, "return"),
         }
     }
 }
@@ -68,6 +79,11 @@ impl TokenKind {
         match identifier.as_str() {
             "fn" => TokenKind::Function,
             "let" => TokenKind::Let,
+            "if" => TokenKind::If,
+            "else" => TokenKind::Else,
+            "true" => TokenKind::True,
+            "false" => TokenKind::False,
+            "return" => TokenKind::Return,
             _ => TokenKind::Ident,
         }
     }
