@@ -41,6 +41,12 @@ impl Lexer {
             ')' => self.new_token(TokenKind::RParen, self.ch.to_string()),
             ',' => self.new_token(TokenKind::Comma, self.ch.to_string()),
             '+' => self.new_token(TokenKind::Plus, self.ch.to_string()),
+            '-' => self.new_token(TokenKind::Minus, self.ch.to_string()),
+            '!' => self.new_token(TokenKind::Bang, self.ch.to_string()),
+            '*' => self.new_token(TokenKind::Asterisk, self.ch.to_string()),
+            '/' => self.new_token(TokenKind::Slash, self.ch.to_string()),
+            '<' => self.new_token(TokenKind::Lt, self.ch.to_string()),
+            '>' => self.new_token(TokenKind::Gt, self.ch.to_string()),
             '{' => self.new_token(TokenKind::LBrace, self.ch.to_string()),
             '}' => self.new_token(TokenKind::RBrace, self.ch.to_string()),
             '\0' => Token {
@@ -321,6 +327,84 @@ mod test {
             Token {
                 kind: TokenKind::RParen,
                 literal: ")".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
+            },
+            Token {
+                kind: TokenKind::Eof,
+                literal: "".to_string(),
+            },
+        ];
+        let mut lexer = Lexer::new(input);
+
+        for (idx, exp_token) in expected.into_iter().enumerate() {
+            let recv_token = &lexer.next_token();
+            assert_eq!(
+                exp_token.kind, recv_token.kind,
+                "tests[{idx}] - token type wrong. expected={:?}, got={:?}",
+                exp_token.kind, recv_token.kind
+            );
+            assert_eq!(
+                exp_token.literal, recv_token.literal,
+                "tests[{idx}] - token literal wrong. expected={}, got={}",
+                exp_token.literal, recv_token.literal
+            );
+        }
+    }
+
+    #[test]
+    fn test_next_token_2() {
+        let input = r#"
+        !-/*5;
+        5 < 10 > 5;
+        "#;
+
+        let expected: Vec<Token> = vec![
+            Token {
+                kind: TokenKind::Bang,
+                literal: "!".to_string(),
+            },
+            Token {
+                kind: TokenKind::Minus,
+                literal: "-".to_string(),
+            },
+            Token {
+                kind: TokenKind::Slash,
+                literal: "/".to_string(),
+            },
+            Token {
+                kind: TokenKind::Asterisk,
+                literal: "*".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "5".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "5".to_string(),
+            },
+            Token {
+                kind: TokenKind::Lt,
+                literal: "<".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "10".to_string(),
+            },
+            Token {
+                kind: TokenKind::Gt,
+                literal: ">".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "5".to_string(),
             },
             Token {
                 kind: TokenKind::Semicolon,

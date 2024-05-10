@@ -10,16 +10,28 @@ pub struct Token {
 pub enum TokenKind {
     Illegal,
     Eof,
+
     Ident,
     Int,
+
     Assign,
     Plus,
+    Minus,
+    Bang,
+    Asterisk,
+    Slash,
+
+    Lt,
+    Gt,
+
     Comma,
     Semicolon,
+
     LParen,
     RParen,
     LBrace,
     RBrace,
+
     Function,
     Let,
 }
@@ -33,6 +45,12 @@ impl Display for TokenKind {
             TokenKind::Int => write!(f, "Int"),
             TokenKind::Assign => write!(f, "="),
             TokenKind::Plus => write!(f, "+"),
+            TokenKind::Minus => write!(f, "-"),
+            TokenKind::Bang => write!(f, "!"),
+            TokenKind::Asterisk => write!(f, "*"),
+            TokenKind::Slash => write!(f, "/"),
+            TokenKind::Lt => write!(f, "<"),
+            TokenKind::Gt => write!(f, ">"),
             TokenKind::Comma => write!(f, ","),
             TokenKind::Semicolon => write!(f, ";"),
             TokenKind::LParen => write!(f, "("),
