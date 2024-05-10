@@ -35,14 +35,28 @@ impl Lexer {
     fn next_token(&mut self) -> Token {
         self.skip_whitespace();
         let token = match self.ch {
-            '=' => self.new_token(TokenKind::Assign, self.ch.to_string()),
+            '=' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    self.new_token(TokenKind::Eq, "==".to_string())
+                } else {
+                    self.new_token(TokenKind::Assign, self.ch.to_string())
+                }
+            }
             ';' => self.new_token(TokenKind::Semicolon, self.ch.to_string()),
             '(' => self.new_token(TokenKind::LParen, self.ch.to_string()),
             ')' => self.new_token(TokenKind::RParen, self.ch.to_string()),
             ',' => self.new_token(TokenKind::Comma, self.ch.to_string()),
             '+' => self.new_token(TokenKind::Plus, self.ch.to_string()),
             '-' => self.new_token(TokenKind::Minus, self.ch.to_string()),
-            '!' => self.new_token(TokenKind::Bang, self.ch.to_string()),
+            '!' => {
+                if self.peek_char() == '=' {
+                    self.read_char();
+                    self.new_token(TokenKind::NotEq, "!=".to_string())
+                } else {
+                    self.new_token(TokenKind::Bang, self.ch.to_string())
+                }
+            }
             '*' => self.new_token(TokenKind::Asterisk, self.ch.to_string()),
             '/' => self.new_token(TokenKind::Slash, self.ch.to_string()),
             '<' => self.new_token(TokenKind::Lt, self.ch.to_string()),
@@ -95,6 +109,14 @@ impl Lexer {
         }
 
         self.input[position..self.position].iter().collect()
+    }
+
+    fn peek_char(&self) -> char {
+        if self.read_position >= self.input.len() {
+            '\0'
+        } else {
+            self.input[self.read_position]
+        }
     }
 
     fn skip_whitespace(&mut self) {
@@ -510,6 +532,69 @@ mod test {
             Token {
                 kind: TokenKind::RBrace,
                 literal: "}".to_string(),
+            },
+            Token {
+                kind: TokenKind::Eof,
+                literal: "".to_string(),
+            },
+        ];
+
+        let mut lexer = Lexer::new(input);
+
+        for (idx, exp_token) in expected.into_iter().enumerate() {
+            let recv_token = &lexer.next_token();
+            assert_eq!(
+                exp_token.kind, recv_token.kind,
+                "tests[{idx}] - token type wrong. expected={:?}, got={:?}",
+                exp_token.kind, recv_token.kind
+            );
+            assert_eq!(
+                exp_token.literal, recv_token.literal,
+                "tests[{idx}] - token literal wrong. expected={}, got={}",
+                exp_token.literal, recv_token.literal
+            );
+        }
+    }
+
+    #[test]
+    fn test_next_token_4() {
+        let input = r#"
+        10 == 10;
+        10 != 9;
+        "#;
+
+        let expected: Vec<Token> = vec![
+            Token {
+                kind: TokenKind::Int,
+                literal: "10".to_string(),
+            },
+            Token {
+                kind: TokenKind::Eq,
+                literal: "==".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "10".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "10".to_string(),
+            },
+            Token {
+                kind: TokenKind::NotEq,
+                literal: "!=".to_string(),
+            },
+            Token {
+                kind: TokenKind::Int,
+                literal: "9".to_string(),
+            },
+            Token {
+                kind: TokenKind::Semicolon,
+                literal: ";".to_string(),
             },
             Token {
                 kind: TokenKind::Eof,
