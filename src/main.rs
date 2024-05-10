@@ -1,9 +1,14 @@
+use std::io;
+
+use crate::repl::start;
+
 pub mod lexer;
+pub mod repl;
 pub mod token;
 fn main() {
-    let token = token::Token {
-        kind: token::TokenKind::Ident,
-        literal: "foobar".to_string(),
-    };
-    println!("{:?}", token)
+    println!("Hello! This is the Monkey Programming language!");
+    println!("Feel free to type in commands");
+    start(io::stdin(), io::stdout());
+
+    println!("Goodbye!");
 }
