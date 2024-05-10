@@ -33,20 +33,31 @@ impl Lexer {
     }
 
     fn next_token(&mut self) -> Token {
+        self.skip_whitespace();
         let token = match self.ch {
-            '=' => self.new_token(TokenKind::Assign, self.ch),
-            ';' => self.new_token(TokenKind::Semicolon, self.ch),
-            '(' => self.new_token(TokenKind::LParen, self.ch),
-            ')' => self.new_token(TokenKind::RParen, self.ch),
-            ',' => self.new_token(TokenKind::Comma, self.ch),
-            '+' => self.new_token(TokenKind::Plus, self.ch),
-            '{' => self.new_token(TokenKind::LBrace, self.ch),
-            '}' => self.new_token(TokenKind::RBrace, self.ch),
+            '=' => self.new_token(TokenKind::Assign, self.ch.to_string()),
+            ';' => self.new_token(TokenKind::Semicolon, self.ch.to_string()),
+            '(' => self.new_token(TokenKind::LParen, self.ch.to_string()),
+            ')' => self.new_token(TokenKind::RParen, self.ch.to_string()),
+            ',' => self.new_token(TokenKind::Comma, self.ch.to_string()),
+            '+' => self.new_token(TokenKind::Plus, self.ch.to_string()),
+            '{' => self.new_token(TokenKind::LBrace, self.ch.to_string()),
+            '}' => self.new_token(TokenKind::RBrace, self.ch.to_string()),
             '\0' => Token {
                 kind: TokenKind::Eof,
                 literal: "".to_string(),
             },
-            _ => self.new_token(TokenKind::Illegal, self.ch),
+            _ => {
+                return if Lexer::is_letter(self.ch) {
+                    let literal = self.read_identifier();
+                    self.new_token(TokenKind::lookup_ident(literal.clone()), literal.clone())
+                } else if Lexer::is_digit(self.ch) {
+                    let literal = self.read_number();
+                    self.new_token(TokenKind::Int, literal)
+                } else {
+                    self.new_token(TokenKind::Illegal, self.ch.to_string())
+                }
+            }
         };
 
         self.read_char();
@@ -54,11 +65,40 @@ impl Lexer {
         token
     }
 
-    fn new_token(&self, kind: TokenKind, ch: char) -> Token {
-        Token {
-            kind,
-            literal: ch.to_string(),
+    fn is_letter(ch: char) -> bool {
+        ch.is_ascii_alphabetic() || ch == '_'
+    }
+
+    fn is_digit(ch: char) -> bool {
+        ch.is_ascii_digit()
+    }
+
+    fn read_number(&mut self) -> String {
+        let position = self.position;
+        while Lexer::is_digit(self.ch) {
+            self.read_char();
         }
+
+        self.input[position..self.position].iter().collect()
+    }
+
+    fn read_identifier(&mut self) -> String {
+        let position = self.position;
+        while Lexer::is_letter(self.ch) {
+            self.read_char();
+        }
+
+        self.input[position..self.position].iter().collect()
+    }
+
+    fn skip_whitespace(&mut self) {
+        while self.ch.is_ascii_whitespace() {
+            self.read_char();
+        }
+    }
+
+    fn new_token(&self, kind: TokenKind, literal: String) -> Token {
+        Token { kind, literal }
     }
 }
 
