@@ -24,19 +24,19 @@ impl Node for StatementNode {
 }
 
 enum ExpressionNode {
-    Identifier,
+    IdentifierNode(Identifier),
 }
 
 impl Node for ExpressionNode {
     fn token_literal(&self) -> String {
         match self {
-            ExpressionNode::Identifier => "identifier".to_string(),
+            ExpressionNode::IdentifierNode(identifier) => identifier.token_literal(),
         }
     }
 
     fn print_string(&self) -> String {
         match self {
-            ExpressionNode::Identifier => "identifier".to_string(),
+            ExpressionNode::IdentifierNode(identifier) => identifier.print_string(),
         }
     }
 }
