@@ -6,19 +6,19 @@ trait Node {
 }
 
 enum StatementNode {
-    Let,
+    Let(LetStatement),
 }
 
 impl Node for StatementNode {
     fn token_literal(&self) -> String {
         match self {
-            StatementNode::Let => "let".to_string(),
+            StatementNode::Let(let_statement) => let_statement.token_literal(),
         }
     }
 
     fn print_string(&self) -> String {
         match self {
-            StatementNode::Let => "let".to_string(),
+            StatementNode::Let(let_statement) => let_statement.print_string(),
         }
     }
 }
