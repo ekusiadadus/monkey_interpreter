@@ -98,9 +98,6 @@ mod tests {
                     let_statement.name.token_literal()
                 );
             }
-            other => {
-                panic!("statement not LetStatement. got={:?}", other);
-            }
         }
     }
 }
