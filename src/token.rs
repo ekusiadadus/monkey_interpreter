@@ -1,13 +1,17 @@
-use std::fmt::{self, Display, Formatter};
+use std::{
+    default,
+    fmt::{self, Display, Formatter},
+};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Token {
     pub kind: TokenKind,
     pub literal: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum TokenKind {
+    #[default]
     Illegal,
     Eof,
 
