@@ -64,7 +64,7 @@ impl Node for Program {
         out
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct LetStatement {
     pub token: Token,
     pub name: Identifier,
@@ -93,7 +93,7 @@ impl Node for LetStatement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Identifier {
     pub token: Token,
     pub value: String,
