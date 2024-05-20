@@ -35,7 +35,7 @@ impl Parser {
                 program.statements.push(statement);
             }
             self.next_token();
-        };
+        }
 
         Some(program)
     }
@@ -54,7 +54,7 @@ impl Parser {
             value: Default::default(),
         };
 
-        return if self.expect_peek(TokenKind::Ident) {
+        return if !self.expect_peek(TokenKind::Ident) {
             None
         } else {
             stmt.name = Identifier {
