@@ -156,6 +156,44 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_return_statements() {
+        let input = r#"
+            return 5;
+            return 10;
+            return 993322;
+        "#;
+
+        let lexer = Lexer::new(input);
+
+        let mut parser = Parser::new(lexer);
+
+        let program = parser.parse_program();
+
+        check_parser_errors(parser);
+
+        match program {
+            Some(program) => {
+                assert_eq!(
+                    program.statements.len(),
+                    3,
+                    "statements does not contain 3 statements. got = {}",
+                    program.statements.len()
+                );
+
+                for stmt in program.statements {
+                    match stmt {
+                        StatementNode::Return(ret_stmt) => {
+                            assert_eq!(ret_stmt.token_literal(), "return", "token literal not `return`, got={}", ret_stmt.token_literal());
+                        },
+                        other => panic!("not Return Statement. got={:?}", other),
+                    }
+                }
+            }
+            None => panic!("parse program shoud not be none")
+        }
+    }
+
     fn test_let_statement(statement: &StatementNode, expected: &str) {
         assert_eq!(
             statement.token_literal(),
@@ -164,7 +202,7 @@ mod tests {
             statement.token_literal()
         );
 
-        match &statement {
+        match statement {
             StatementNode::Let(let_statement) => {
                 assert_eq!(
                     let_statement.name.value, expected,
@@ -179,9 +217,12 @@ mod tests {
                     expected,
                     let_statement.name.token_literal()
                 );
-            }
+            },
+            _ => panic!("not a Let Statement")
         }
     }
+
+  
 
     fn check_parser_errors(parser: Parser) {
         let errors = parser.errors();

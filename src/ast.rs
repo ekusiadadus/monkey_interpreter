@@ -8,18 +8,21 @@ pub trait Node {
 #[derive(Debug)]
 pub enum StatementNode {
     Let(LetStatement),
+    Return(ReturnStatement),
 }
 
 impl Node for StatementNode {
     fn token_literal(&self) -> String {
         match self {
             StatementNode::Let(let_statement) => let_statement.token_literal(),
+            StatementNode::Return(ret_statement) => ret_statement.token_literal(),
         }
     }
 
     fn print_string(&self) -> String {
         match self {
             StatementNode::Let(let_statement) => let_statement.print_string(),
+            StatementNode::Return(ret_statement) => ret_statement.print_string(),
         }
     }
 }
@@ -106,5 +109,21 @@ impl Node for Identifier {
 
     fn print_string(&self) -> String {
         self.value.clone()
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct ReturnStatement {
+    pub token: Token,
+    pub ret_value: Option<ExpressionNode>
+}
+
+impl Node for ReturnStatement {
+    fn token_literal(&self) -> String {
+        self.token.literal.clone()
+    }
+
+    fn print_string(&self) -> String {
+        todo!()
     }
 }
