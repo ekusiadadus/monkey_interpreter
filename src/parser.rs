@@ -1,5 +1,5 @@
 use crate::{
-    ast::{Identifier, LetStatement, Program, StatementNode},
+    ast::{Identifier, LetStatement, Program, ReturnStatement, StatementNode},
     lexer::Lexer,
     token::{Token, TokenKind},
 };
@@ -47,6 +47,7 @@ impl Parser {
     pub fn parse_statement(&mut self) -> Option<StatementNode> {
         match self.cur_token.kind {
             TokenKind::Let => self.parse_let_statement(),
+            TokenKind::Return => self.parse_return_statement(),
             _ => None,
         }
     }
@@ -77,6 +78,21 @@ impl Parser {
                 Some(StatementNode::Let(stmt))
             }
         };
+    }
+
+    pub fn parse_return_statement(&mut self) -> Option<StatementNode> {
+        let stmt = ReturnStatement {
+            token: self.cur_token.clone(),
+            ret_value: Default::default(),
+        };
+
+        self.next_token();
+
+        while !self.cur_token_is(TokenKind::Semicolon) {
+            self.next_token();
+        }
+
+        Some(StatementNode::Return(stmt))
     }
 
     fn expect_peek(&mut self, token_kind: TokenKind) -> bool {
