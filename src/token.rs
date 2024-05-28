@@ -1,12 +1,12 @@
 use std::fmt::{self, Display, Formatter};
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Hash)]
 pub struct Token {
     pub kind: TokenKind,
     pub literal: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Default, Hash, Eq)]
 pub enum TokenKind {
     #[default]
     Illegal,
