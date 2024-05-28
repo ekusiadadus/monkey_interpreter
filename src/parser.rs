@@ -143,11 +143,12 @@ impl Parser {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::Parser;
     use crate::{
-        ast::{Node, StatementNode},
+        ast::{ExpressionNode, Node, Program, StatementNode},
         lexer::Lexer,
     };
 
@@ -229,6 +230,30 @@ mod tests {
                 }
             }
             None => panic!("parse program shoud not be none"),
+        }
+    }
+
+    #[test]
+    fn test_identifier_expression(){
+        let input = "foobar;";
+        let lexer = Lexer::new(input);
+        let mut parser = Parser::new(lexer);
+        let program = parser.parse_program().unwrap();
+        check_parser_errors(parser);
+
+        assert_eq!(program.statements.len(), 1, "statements does not contain enought statements. got={}", program.statements.len());
+
+        match &program.statements[0] {
+            StatementNode::Expression(exp_stmt) => {
+                assert!(exp_stmt.expression.is_some());
+                match exp_stmt.expression.as_ref().unwrap() {
+                    ExpressionNode::IdentifierNode(identifider) => {
+                        assert_eq!(identifider.value, "foobar", "identifider value not `foobar`. got={}", identifider.value);
+                        assert_eq!(identifider.token_literal(), "foobar", "identifier.token_literal() is not `foobar`. got={}", identifider.token_literal());
+                    },
+                }
+            },
+            other => panic!("program.statements[0] is not ExpressionStatement. got={:?}", other)
         }
     }
 
