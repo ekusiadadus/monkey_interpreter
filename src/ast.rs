@@ -9,6 +9,7 @@ pub trait Node {
 pub enum StatementNode {
     Let(LetStatement),
     Return(ReturnStatement),
+    Expression(ExpressionStatement),
 }
 
 impl Node for StatementNode {
@@ -16,6 +17,7 @@ impl Node for StatementNode {
         match self {
             StatementNode::Let(let_statement) => let_statement.token_literal(),
             StatementNode::Return(ret_statement) => ret_statement.token_literal(),
+            StatementNode::Expression(expression) => expression.token_literal(),
         }
     }
 
@@ -23,6 +25,7 @@ impl Node for StatementNode {
         match self {
             StatementNode::Let(let_statement) => let_statement.print_string(),
             StatementNode::Return(ret_statement) => ret_statement.print_string(),
+            StatementNode::Expression(expression) => expression.print_string(),
         }
     }
 }
@@ -52,17 +55,22 @@ pub struct Program {
 
 impl Node for Program {
     fn token_literal(&self) -> String {
-        if self.statements.len() > 0 {
-            self.statements[0].token_literal()
-        } else {
-            "".to_string()
+        return if self.statements.len() > 0{
+            match &self.statements[0] {
+                StatementNode::Let(let_stmt) => let_stmt.token_literal(),
+                StatementNode::Return(return_stmt) => return_stmt.token_literal(),
+                StatementNode::Expression(expression) => expression.token_literal(),
+            }
+        } else{
+            String::from("")
         }
+        
     }
 
     fn print_string(&self) -> String {
-        let mut out = String::new();
-        for statement in &self.statements {
-            out.push_str(&statement.print_string());
+        let mut out = String::from("");
+        for stmt in self.statements.as_slice() {
+            out.push_str(stmt.print_string().as_str());
         }
         out
     }
@@ -124,6 +132,35 @@ impl Node for ReturnStatement {
     }
 
     fn print_string(&self) -> String {
-        todo!()
+        let mut out = String::from("");
+        out.push_str(self.token_literal().as_str());
+        out.push_str(" ");
+        if let Some(ret_value) = &self.ret_value {
+            out.push_str(ret_value.print_string().as_str());
+        }
+
+        out.push_str(";");
+        out
+    }
+
+}
+
+#[derive(Debug, Default)]
+pub struct ExpressionStatement {
+    pub token: Token,
+    pub expression: Option<ExpressionNode>,
+}
+
+impl Node for ExpressionStatement {
+    fn token_literal(&self) -> String {
+        self.token.literal.clone()
+    }
+
+    fn print_string(&self) -> String {
+       if let Some(expression) = &self.expression {
+           return expression.print_string();
+       } 
+
+       String::from("")
     }
 }
