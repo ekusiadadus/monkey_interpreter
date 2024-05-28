@@ -200,13 +200,18 @@ mod tests {
                 for stmt in program.statements {
                     match stmt {
                         StatementNode::Return(ret_stmt) => {
-                            assert_eq!(ret_stmt.token_literal(), "return", "token literal not `return`, got={}", ret_stmt.token_literal());
-                        },
+                            assert_eq!(
+                                ret_stmt.token_literal(),
+                                "return",
+                                "token literal not `return`, got={}",
+                                ret_stmt.token_literal()
+                            );
+                        }
                         other => panic!("not Return Statement. got={:?}", other),
                     }
                 }
             }
-            None => panic!("parse program shoud not be none")
+            None => panic!("parse program shoud not be none"),
         }
     }
 
@@ -233,12 +238,10 @@ mod tests {
                     expected,
                     let_statement.name.token_literal()
                 );
-            },
-            _ => panic!("not a Let Statement")
+            }
+            _ => panic!("not a Let Statement"),
         }
     }
-
-  
 
     fn check_parser_errors(parser: Parser) {
         let errors = parser.errors();
