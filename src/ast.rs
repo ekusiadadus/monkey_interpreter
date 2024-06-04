@@ -42,6 +42,7 @@ impl Node for ExpressionNode {
         match self {
             ExpressionNode::IdentifierNode(identifier) => identifier.token_literal(),
             ExpressionNode::Integer(integer) => integer.token_literal(),
+            ExpressionNode::Prefix(prefix_exp) => prefix_exp.token_literal(),
         }
     }
 
@@ -49,6 +50,7 @@ impl Node for ExpressionNode {
         match self {
             ExpressionNode::IdentifierNode(identifier) => identifier.print_string(),
             ExpressionNode::Integer(integer) => integer.print_string(),
+            ExpressionNode::Prefix(prefix_exp) => prefix_exp.print_string(),
         }
     }
 }
