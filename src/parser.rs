@@ -2,8 +2,7 @@ use std::{collections::HashMap, i64};
 
 use crate::{
     ast::{
-        ExpressionNode, ExpressionStatement, Identifier, IntegerLiteral, LetStatement, Program,
-        ReturnStatement, StatementNode,
+        ExpressionNode, ExpressionStatement, Identifier, IntegerLiteral, LetStatement, PrefixExpression, Program, ReturnStatement, StatementNode
     },
     lexer::{self, Lexer},
     token::{Token, TokenKind},
@@ -44,6 +43,8 @@ impl Parser {
 
         parser.register_prefix(TokenKind::Ident, Self::parse_identifier);
         parser.register_prefix(TokenKind::Int, Self::parse_integer_literal);
+        parser.register_prefix(TokenKind::Bang, Self::parse_prefix_expression);
+        parser.register_prefix(TokenKind::Minus, Self::parse_prefix_expression);
         parser.next_token();
         parser.next_token();
 
@@ -74,6 +75,23 @@ impl Parser {
                 None
             }
         };
+    }
+
+    fn parse_prefix_expression(&mut self) -> Option<ExpressionNode> {
+        let mut expression = PrefixExpression {
+            token: self.cur_token.clone(),
+            operator: self.cur_token.literal.clone(),
+            right: Default::default(),
+        };
+
+        self.next_token();
+        match self.parse_expression(PrecedenceLevel::Prefix) {
+            Some(exp) => expression.right = Box::new(exp),
+            None => return None,
+        }
+
+        Some(ExpressionNode::Prefix(expression))
+
     }
 
     fn next_token(&mut self) {
@@ -166,7 +184,13 @@ impl Parser {
             return left_exp;
         }
 
+        self.no_prefix_parse_fn_error(self.cur_token.kind);
         None
+    }
+
+    fn no_prefix_parse_fn_error(&mut self, token_kind: TokenKind) {
+        let msg = format!("no prefix parse function for {} found", token_kind);
+        self.errors.push(msg);
     }
 
     fn expect_peek(&mut self, token_kind: TokenKind) -> bool {
@@ -210,6 +234,7 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
+
     use super::Parser;
     use crate::{
         ast::{ExpressionNode, Node, Program, StatementNode},
@@ -381,6 +406,48 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_parsing_prefix_expressions() {
+        let prefix_tests = vec![("!5", "!", 5), ("-15", "-", 15)];
+
+        for test in prefix_tests {
+            let lexer = Lexer::new(test.0);
+            let mut parser = Parser::new(lexer);
+            let program = parser.parse_program().unwrap();
+
+            check_parser_errors(parser);
+
+            assert_eq!(
+                program.statements.len(),
+                1,
+                "program.statements does not contain enough statements. got={}",
+                program.statements.len(),
+            );
+
+            match &program.statements[0] {
+                StatementNode::Expression(exp_stmt) => {
+                    assert!(exp_stmt.expression.is_some());
+                    let exp = exp_stmt.expression.as_ref().unwrap();
+                    match exp {
+                        ExpressionNode::Prefix(prefix_exp) => {
+                            assert_eq!(
+                                prefix_exp.operator, test.1,
+                                "prefix_exp.operator not {}, got={}",
+                                test.1, prefix_exp.operator
+                            );
+                            test_integer_literal(&prefix_exp.right, test.2);
+                        }
+                        other => panic!("exp not PrefixExpression. got={:?}", other),
+                    }
+                }
+                other => panic!(
+                    "program.statements[0] is not ExpressionStatement. got={:?}",
+                    other
+                ),
+            }
+        }
+    }
+
     fn test_let_statement(statement: &StatementNode, expected: &str) {
         assert_eq!(
             statement.token_literal(),
@@ -421,5 +488,25 @@ mod tests {
         }
 
         panic!("parser error parent");
+    }
+
+    fn test_integer_literal(exp: &ExpressionNode, value: i64) {
+        match exp {
+            ExpressionNode::Integer(int_exp) => {
+                assert_eq!(
+                    int_exp.value, value,
+                    "int_exp.value not {}, got={}",
+                    value, int_exp.value
+                );
+                assert_eq!(
+                    int_exp.token_literal(),
+                    format!("{}", value),
+                    "int_exp.token_literal() not {}, got={}",
+                    value,
+                    int_exp.value
+                );
+            }
+            other => panic!("exp not IntegerLiteral. got={:?}", other),
+        }
     }
 }
